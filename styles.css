@@ -65,3 +65,10 @@ header{
     gap: 12px;
     margin-bottom: 32px;
 }
+.tarjeta-color {
+    transition: transform 0.2s;
+}
+
+.tarjeta-color:active {
+    transform: scale(0.9);
+}
