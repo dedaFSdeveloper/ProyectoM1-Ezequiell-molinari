@@ -2,13 +2,11 @@ let boton = document.getElementById("btn-generar");
 let contenedor = document.getElementById("contenedor-colores");
 let selector = document.getElementById("cantidad-colores");
 let toast = document.getElementById("toast");
-
 function rgbAHsl(r, g, b) {
     r /= 255; g /= 255; b /= 255;
     let max = Math.max(r, g, b);
     let min = Math.min(r, g, b);
     let h, s, l = (max + min) / 2;
-
     if (max === min) {
         h = s = 0;
     } else {
@@ -27,26 +25,48 @@ function colorchanger(r, g, b){
     return luminancia > 186;
 }
 boton.addEventListener("click", function() {
+    let tarjetasExistentes = contenedor.querySelectorAll(".tarjeta-color");
+    let bloqueadas = [];
+    tarjetasExistentes.forEach(function(t) {
+        if (t.classList.contains("locked")) {
+            bloqueadas.push(t.cloneNode(true));
+        }
+    });
     contenedor.innerHTML = "";
-    for (let i = 0; i < Number(selector.value); i++) {  
+    bloqueadas.forEach(function(t) {
+        contenedor.appendChild(t);
+    });
+    let cantidad = Number(selector.value);
+    let bloqueadasCount = bloqueadas.length;
+    for (let i = 0; i < cantidad - bloqueadasCount; i++) {
         let r = Math.floor(Math.random() * 256);
         let g = Math.floor(Math.random() * 256);
         let b = Math.floor(Math.random() * 256);
-        let hex = "#" + r.toString(16).padStart(2, "0") 
-        + g.toString(16).padStart(2, "0") 
+        let hex = "#" + r.toString(16).padStart(2, "0")
+        + g.toString(16).padStart(2, "0")
         + b.toString(16).padStart(2, "0");
         let tarjeta = document.createElement("div");
         tarjeta.classList.add("tarjeta-color");
         tarjeta.style.backgroundColor = hex;
         let hsl = rgbAHsl(r, g, b);
-        tarjeta.innerHTML = `<span>${hex}</span><span>${hsl}</span>`;
+        tarjeta.innerHTML = `
+            <button class="lock-btn">🔓</button>
+            <span>${hex}</span>
+            <span>${hsl}</span>
+        `;
         tarjeta.style.color = colorchanger(r, g, b) ? "black" : "white";
         contenedor.appendChild(tarjeta);
+        let lockBtn = tarjeta.querySelector(".lock-btn");
+        lockBtn.addEventListener("click", function(evento) {
+            evento.stopPropagation();
+            tarjeta.classList.toggle("locked");
+            lockBtn.textContent = tarjeta.classList.contains("locked") ? "🔒" : "🔓";
+        });
         tarjeta.addEventListener("click", function() {
             navigator.clipboard.writeText(hex);
             toast.classList.add("visible");
             setTimeout(function() {
-            toast.classList.remove("visible");
+                toast.classList.remove("visible");
             }, 1500);
         });
     }
