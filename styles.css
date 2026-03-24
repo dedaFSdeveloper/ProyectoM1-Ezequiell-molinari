@@ -110,3 +110,25 @@ label{
     font-size: 25px;
     color:white
 }
+#toast {
+    position: fixed;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    color: black;
+    padding: 12px 24px;
+    border-radius: 8px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 14px;
+}
+#toast.visible {
+    opacity: 1;
+}
+.tarjeta-color span {
+    display: block;
+    text-align: center;
+    font-size: 10px;
+    font-weight: bold;
+}
