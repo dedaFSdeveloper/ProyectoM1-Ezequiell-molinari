@@ -6,6 +6,9 @@ let btnGuardar = document.getElementById("btn-guardar");
 let btnTogglePanel = document.getElementById("btn-toggle-panel");
 let panelPaletas = document.getElementById("panel-paletas");
 let listaPaletas = document.getElementById("lista-paletas");
+let modoActual = "hex";
+let toggleFormato = document.getElementById("toggle-formato");
+let labelTexto = document.querySelector(".label-texto");
 function rgbAHsl(r, g, b) {
     r /= 255; g /= 255; b /= 255;
     let max = Math.max(r, g, b);
@@ -66,7 +69,7 @@ function renderizarPaletas() {
                 tarjeta.classList.add("tarjeta-color");
                 tarjeta.style.backgroundColor = c.bg;
                 tarjeta.style.color = c.textColor;
-                tarjeta.innerHTML = `<button class="lock-btn">🔓</button><span>${c.hex}</span><span>${c.hsl}</span>`;
+                tarjeta.innerHTML = `<button class="lock-btn">🔓</button><span class="hex">${c.hex}</span><span class="hsl">${c.hsl}</span>`;
                 let lockBtn = tarjeta.querySelector(".lock-btn");
                 lockBtn.addEventListener("click", function(e) {
                     e.stopPropagation();
@@ -74,7 +77,7 @@ function renderizarPaletas() {
                     lockBtn.textContent = tarjeta.classList.contains("locked") ? "🔒" : "🔓";
                     guardarEstadoActual();
                 });
-                tarjeta.addEventListener("click", function() { navigator.clipboard.writeText(c.hex); mostrarToast("¡Color copiado!"); });
+                tarjeta.addEventListener("click", function() { navigator.clipboard.writeText(modoActual === "hex" ? tarjeta.querySelector(".hex").textContent : tarjeta.querySelector(".hsl").textContent); mostrarToast("¡Color copiado!"); });
                 contenedor.appendChild(tarjeta);
             });
             guardarEstadoActual();
@@ -91,7 +94,7 @@ if (data) {
         tarjeta.style.backgroundColor = c.bg;
         tarjeta.style.color = c.textColor;
         if (c.locked) tarjeta.classList.add("locked");
-        tarjeta.innerHTML = `<button class="lock-btn">${c.locked ? "🔒" : "🔓"}</button><span>${c.hex}</span><span>${c.hsl}</span>`;
+        tarjeta.innerHTML = `<button class="lock-btn">${c.locked ? "🔒" : "🔓"}</button><span class="hex">${c.hex}</span><span class="hsl">${c.hsl}</span>`;
         let lockBtn = tarjeta.querySelector(".lock-btn");
         lockBtn.addEventListener("click", function(e) {
             e.stopPropagation();
@@ -99,7 +102,7 @@ if (data) {
             lockBtn.textContent = tarjeta.classList.contains("locked") ? "🔒" : "🔓";
             guardarEstadoActual();
         });
-        tarjeta.addEventListener("click", function() { navigator.clipboard.writeText(c.hex); mostrarToast("¡Color copiado!"); });
+        tarjeta.addEventListener("click", function() { navigator.clipboard.writeText(modoActual === "hex" ? tarjeta.querySelector(".hex").textContent : tarjeta.querySelector(".hsl").textContent); mostrarToast("¡Color copiado!"); });
         contenedor.appendChild(tarjeta);
     });
 }
@@ -120,7 +123,7 @@ boton.addEventListener("click", function() {
         tarjeta.classList.add("locked");
         tarjeta.style.backgroundColor = c.bg;
         tarjeta.style.color = c.textColor;
-        tarjeta.innerHTML = `<button class="lock-btn">🔒</button><span>${c.hex}</span><span>${c.hsl}</span>`;
+        tarjeta.innerHTML = `<button class="lock-btn">🔒</button><span class="hex">${c.hex}</span><span class="hsl">${c.hsl}</span>`;
         let lockBtn = tarjeta.querySelector(".lock-btn");
         lockBtn.addEventListener("click", function(e) {
             e.stopPropagation();
@@ -128,7 +131,7 @@ boton.addEventListener("click", function() {
             lockBtn.textContent = tarjeta.classList.contains("locked") ? "🔒" : "🔓";
             guardarEstadoActual();
         });
-        tarjeta.addEventListener("click", function() { navigator.clipboard.writeText(c.hex); mostrarToast("¡Color copiado!"); });
+        tarjeta.addEventListener("click", function() { navigator.clipboard.writeText(modoActual === "hex" ? tarjeta.querySelector(".hex").textContent : tarjeta.querySelector(".hsl").textContent); mostrarToast("¡Color copiado!"); });
         contenedor.appendChild(tarjeta);
     });
     for (let i = 0; i < cantidad - bloqueadas.length; i++) {
@@ -141,7 +144,7 @@ boton.addEventListener("click", function() {
         tarjeta.classList.add("tarjeta-color");
         tarjeta.style.backgroundColor = hex;
         tarjeta.style.color = colorchanger(r, g, b) ? "black" : "white";
-        tarjeta.innerHTML = `<button class="lock-btn">🔓</button><span>${hex}</span><span>${hsl}</span>`;
+        tarjeta.innerHTML = `<button class="lock-btn">🔓</button><span class="hex">${hex}</span><span class="hsl">${hsl}</span>`;
         let lockBtn = tarjeta.querySelector(".lock-btn");
         lockBtn.addEventListener("click", function(e) {
             e.stopPropagation();
@@ -149,7 +152,7 @@ boton.addEventListener("click", function() {
             lockBtn.textContent = tarjeta.classList.contains("locked") ? "🔒" : "🔓";
             guardarEstadoActual();
         });
-        tarjeta.addEventListener("click", function() { navigator.clipboard.writeText(hex); mostrarToast("¡Color copiado!"); });
+        tarjeta.addEventListener("click", function() { navigator.clipboard.writeText(modoActual === "hex" ? tarjeta.querySelector(".hex").textContent : tarjeta.querySelector(".hsl").textContent); mostrarToast("¡Color copiado!"); });
         contenedor.appendChild(tarjeta);
     }
     guardarEstadoActual();
@@ -178,4 +181,23 @@ document.addEventListener("keydown", function(e) {
         boton.click();
     }
 });
+toggleFormato.addEventListener("change", function() {
+    if (toggleFormato.checked) {
+        document.body.classList.add("modo-hsl");
+        modoActual = "hsl";
+        labelTexto.textContent = "HSL";
+    } else {
+        document.body.classList.remove("modo-hsl");
+        modoActual = "hex";
+        labelTexto.textContent = "HEX";
+    }
+    localStorage.setItem("modo", modoActual);
+});
+let modoGuardado = localStorage.getItem("modo");
+if (modoGuardado === "hsl") {
+    document.body.classList.add("modo-hsl");
+    toggleFormato.checked = true;
+    modoActual = "hsl";
+    labelTexto.textContent = "HSL";
+}
 if (contenedor.children.length === 0) boton.click();
